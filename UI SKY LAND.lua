@@ -96,34 +96,32 @@ end)
 
 local function MakeDraggable(DragPoint, Main)
     pcall(function()
-        local Dragging, DragInput, TouchPos, FramePos = false
-        AddConnection(DragPoint.InputBegan, function(Input)
+        local Dragging, DragInput, StartPos, StartObjPos = false
+        local UserInputService = game:GetService("UserInputService")
+
+        DragPoint.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                 Dragging = true
-                TouchPos = Input.Position
-                FramePos = Main.Position
-
-				Input.Changed:Connect(function()
-                    if Input.UserInputState == Enum.UserInputState.End then
-                        Dragging = false
-                    end
-                end)
+                StartPos = Input.Position
+                StartObjPos = Main.Position
             end
         end)
-		AddConnection(DragPoint.InputChanged, function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseMovement then
-				DragInput = Input
-			end
-		end)
-		AddConnection(DragPoint.InputChanged, function(Input)
+
+        DragPoint.InputChanged:Connect(function(Input)
             if (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) and Dragging then
-                local Delta = Input.Position - TouchPos
-                Main.Position = UDim2.new(FramePos.X.Scale, FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)
-                TouchPos = Input.Position  -- Atualize a posição do toque para o próximo loop
+                local Delta = Input.Position - StartPos
+                Main.Position = UDim2.new(StartObjPos.X.Scale, StartObjPos.X.Offset + Delta.X, StartObjPos.Y.Scale, StartObjPos.Y.Offset + Delta.Y)
+            end
+        end)
+
+        UserInputService.InputEnded:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                Dragging = false
             end
         end)
     end)
-end   
+end
+
 
 local function Create(Name, Properties, Children)
 	local Object = Instance.new(Name)
