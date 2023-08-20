@@ -96,7 +96,8 @@ end)
 
 local function MakeDraggable(DragPoint, Main)
     pcall(function()
-        local Dragging, DragInput, StartPos, StartObjPos = false
+        local Dragging = false
+        local StartPos, StartObjPos
         local UserInputService = game:GetService("UserInputService")
 
         DragPoint.InputBegan:Connect(function(Input)
@@ -107,8 +108,8 @@ local function MakeDraggable(DragPoint, Main)
             end
         end)
 
-        DragPoint.InputChanged:Connect(function(Input)
-            if (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) and Dragging then
+        UserInputService.InputChanged:Connect(function(Input)
+            if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
                 local Delta = Input.Position - StartPos
                 Main.Position = UDim2.new(StartObjPos.X.Scale, StartObjPos.X.Offset + Delta.X, StartObjPos.Y.Scale, StartObjPos.Y.Offset + Delta.Y)
             end
@@ -121,6 +122,7 @@ local function MakeDraggable(DragPoint, Main)
         end)
     end)
 end
+
 
 
 local function Create(Name, Properties, Children)
